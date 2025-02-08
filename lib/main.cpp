@@ -30,8 +30,8 @@ void readSparseMatrix(SparseMatrix& m, const std::string& nomeArquivo) {
         arquivo >> linhas >> colunas;
 
         // Atualiza as dimensões da matriz
-        m.Linha = linhas;
-        m.Coluna = colunas;
+       m = new SparseMatrix (linhas, colunas);
+
 
         // Lê as triplas (i, j, valor) do arquivo e insere os elementos na matriz.
         int i, j;
