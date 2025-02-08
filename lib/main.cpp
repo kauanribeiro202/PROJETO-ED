@@ -25,6 +25,7 @@ SparseMatrix lerMatris(){
 int main () {
 
 
+    std::cout<<"teste"<<"\n";
 
     return 0;
 }
