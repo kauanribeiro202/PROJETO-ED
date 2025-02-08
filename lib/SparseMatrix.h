@@ -76,11 +76,11 @@ void insert(int n, int m, double value)
 
     //chega na linha de inserção
     Node* l_atual = m_head->abaixo;
-    while(l_atual->linha != m and l_atual->abaixo = m_head){
+    while(l_atual->linha != m and l_atual->abaixo != m_head){
         l_atual = l_atual->abaixo;
     }
     //chega na coluna de inseção
-    Node* c_atual - m_head->direita;
+    Node* c_atual = m_head->direita;
     while (c_atual->coluna != n and c_atual->direita != m_head){
         c_atual = c_atual->direita;
     }
@@ -97,7 +97,7 @@ void insert(int n, int m, double value)
         aux->direita = inserted;
         c_atual->abaixo = inserted;
     } 
-    
+
 }
 
 //busca a coordenada solicitada e retorna  seu valor, se a coordenad nao existir retorna 0

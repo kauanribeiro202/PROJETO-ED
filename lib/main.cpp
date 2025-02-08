@@ -24,6 +24,8 @@ SparseMatrix lerMatris(){
 //main
 int main () {
 
+    SparseMatrix* M = new SparseMatrix(4,4);
+    M->insert(2,2, 666);
 
     std::cout<<"teste"<<"\n";
 
