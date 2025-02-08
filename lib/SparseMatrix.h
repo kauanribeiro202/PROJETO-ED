@@ -57,11 +57,33 @@ SparseMatrix(){
 ~SparseMatrix(){
 clear();
 
+// Desalocar todas as colunas da primeira linha separadamente
+Node* colAtual = m_head->direita;
+        while (colAtual != m_head) {
+            Node* colTemp = colAtual;
+            colAtual = colAtual->direita;
+            delete colTemp;
+        }
+
+// Finalmente, desalocar o nó principal
+delete m_head;
 }
 
 //funcao auxiliar clear
 void clear(){
-
+    // Desalocar todas as colunas de cada linha
+        Node* linhaAtual = m_head->abaixo;
+        while (linhaAtual != m_head) {
+            Node* colAtual = linhaAtual->direita;
+            while (colAtual != linhaAtual) {
+                Node* colTemp = colAtual;
+                colAtual = colAtual->direita;
+                delete colTemp;
+            }
+            Node* linhaTemp = linhaAtual;
+            linhaAtual = linhaAtual->abaixo;
+            delete linhaTemp;
+        }
 }
 
 //insert, busca a cordenada a qual deve inserir o valor e aloca ele la, se ja estiver preenchida, apenas substitui SEM ALOCAR NOVO NO
@@ -138,7 +160,7 @@ double get(int n, int m) {
 }
 
 
-//usa a funcao get como auxiliar para printar a funcao
+
 void print() {
     Node *auxl = m_head->abaixo;
 
