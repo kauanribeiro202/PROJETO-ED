@@ -30,7 +30,7 @@ SparseMatrix(int n, int m)
 
     //cria os cabeçalhos das linhas
     Node* aux = m_head;
-    for (int i=1; i<n; i++){
+    for (int i=1; i<=n; i++){
         Node* m_cab = new Node(nullptr, nullptr, 0, i, 0.0);
         m_cab->abaixo = m_cab;
         aux->direita = m_cab;
@@ -39,7 +39,7 @@ SparseMatrix(int n, int m)
 
     //cria os cabeçalhos das colunas
     aux = m_head;
-    for (int i=1; i<n; i++){
+    for (int i=1; i<=m; i++){
         Node* m_cab = new Node(nullptr, nullptr, i, 0, 0.0);
         m_cab->direita = m_cab;
         aux->abaixo = m_cab;
@@ -67,7 +67,7 @@ void clear(){
 //insert, busca a cordenada a qual deve inserir o valor e aloca ele la, se ja estiver preenchida, apenas substitui SEM ALOCAR NOVO NO
 void insert(int n, int m, double value)
 {
-    if(m> Linha or n> Coluna or m<1 or n<1){
+    if(m> Linha || n> Coluna || m<1 or n<1){
         std::__throw_out_of_range("fora de escopo");
         return;
     }
@@ -76,17 +76,17 @@ void insert(int n, int m, double value)
 
     //chega na linha de inserção
     Node* l_atual = m_head->abaixo;
-    while(l_atual->linha != m and l_atual->abaixo != m_head){
+    while(l_atual->linha != m && l_atual->abaixo != m_head){
         l_atual = l_atual->abaixo;
     }
     //chega na coluna de inseção
     Node* c_atual = m_head->direita;
-    while (c_atual->coluna != n and c_atual->direita != m_head){
+    while (c_atual->coluna != n && c_atual->direita != m_head){
         c_atual = c_atual->direita;
     }
     
     Node* aux = l_atual;
-    while(l_atual->direita != l_atual and aux->direita->coluna < n){
+    while(l_atual->direita != l_atual && aux->direita->coluna < n){
         aux = aux->direita;
     }
 
@@ -97,19 +97,33 @@ void insert(int n, int m, double value)
         aux->direita = inserted;
         c_atual->abaixo = inserted;
     } 
-
+    
 }
 
 //busca a coordenada solicitada e retorna  seu valor, se a coordenad nao existir retorna 0
-double get(int n, int m){
+double get(int n, int m);
 
-
-}
 
 //usa a funcao get como auxiliar para printar a funcao
-void print(){
+void print() {
+    Node *auxl = m_head->abaixo;
 
+    for (int i = 1; i <= Linha; i++) {
+        Node *auxc = auxl->direita;
+
+        for (int j = 1; j <= Coluna; j++) {
+            if (auxc->linha == i && auxc->coluna == j) {
+                std::cout << auxc->valor << " ";
+                auxc = auxc->direita;
+            } else {
+                std::cout << "0 ";
+            }
+        }
+        std::cout << std::endl;
+        auxl = auxl->abaixo;
+    }
 }
+
 
 //funcao opcional de atribuicao
 void operator=(SparseMatrix&matriz){
