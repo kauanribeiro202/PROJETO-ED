@@ -68,6 +68,12 @@ SparseMatrix() {
         m_head->abaixo = m_cab;
     }
 
+SparseMatrix(const SparseMatrix& matriz) {
+    m_head = new Node(nullptr, nullptr, 0, 0, 0.0);
+    m_head->abaixo = m_head;
+    m_head->direita = m_head;
+    *this = matriz; // Usa o operador de atribuição para copiar os dados
+}
 //destrutor
 ~SparseMatrix(){
 clear();
@@ -195,81 +201,19 @@ void print() {
 
 
 //funcao opcional de atribuicao
-SparseMatrix& SparseMatrix::operator=(const SparseMatrix& matriz) {
+SparseMatrix& operator=(const SparseMatrix& matriz) {
     if (this != &matriz) {  // Evita autoatribuição
+        this->clear();  // Remove os nós atuais da matriz
 
-        // Ajuste os cabeçalhos das linhas e colunas conforme necessário
-        if (this->Linha != matriz.Linha) {
-            Node* linhaAtual = m_head;
-            while (linhaAtual->direita != m_head) {
-                linhaAtual = linhaAtual->direita;
-            }
-            for (int i = this->Linha + 1; i <= matriz.Linha; i++) {
-                Node* novoCabecalho = new Node(nullptr, nullptr, 0, i, 0.0);
-                novoCabecalho->abaixo = novoCabecalho;
-                linhaAtual->direita = novoCabecalho;
-                linhaAtual = novoCabecalho;
-            }
-            this->Linha = matriz.Linha;
-        } else if (this->Linha > matriz.Linha) {
-            Node* linhaAtual = m_head;
-            for (int i = 1; i < matriz.Linha; i++) {
-                linhaAtual = linhaAtual->direita;
-            }
-            while (linhaAtual->direita != m_head) {
-                Node* toDelete = linhaAtual->direita;
-                linhaAtual->direita = toDelete->direita;
-                delete toDelete;
-            }
-            this->Linha = matriz.Linha;
-        }
+        this->Linha = matriz.Linha;
+        this->Coluna = matriz.Coluna;
 
-        if (this->Coluna != matriz.Coluna) {
-            Node* colunaAtual = m_head;
-            while (colunaAtual->abaixo != m_head) {
-                colunaAtual = colunaAtual->abaixo;
-            }
-            for (int i = this->Coluna + 1; i <= matriz.Coluna; i++) {
-                Node* novoCabecalho = new Node(nullptr, nullptr, i, 0, 0.0);
-                novoCabecalho->direita = novoCabecalho;
-                colunaAtual->abaixo = novoCabecalho;
-                colunaAtual = novoCabecalho;
-            }
-            this->Coluna = matriz.Coluna;
-        } else if (this->Coluna > matriz.Coluna) {
-            Node* colunaAtual = m_head;
-            for (int i = 1; i < matriz.Coluna; i++) {
-                colunaAtual = colunaAtual->abaixo;
-            }
-            while (colunaAtual->abaixo != m_head) {
-                Node* toDelete = colunaAtual->abaixo;
-                colunaAtual->abaixo = toDelete->abaixo;
-                delete toDelete;
-            }
-            this->Coluna = matriz.Coluna;
-        }
-
-        // Atualizar os valores da matriz original, sem criar cópias
+        // Copia os valores da matriz original
         Node* linhaAtual = matriz.m_head->abaixo;
         while (linhaAtual != matriz.m_head) {
             Node* colAtual = linhaAtual->direita;
             while (colAtual != linhaAtual) {
-                // Em vez de inserir novos nós, apenas atualiza os existentes
-                Node* linha = m_head->abaixo;
-                while (linha != m_head && linha->linha != colAtual->linha) {
-                    linha = linha->abaixo;
-                }
-                Node* coluna = linha->direita;
-                while (coluna != linha && coluna->coluna != colAtual->coluna) {
-                    coluna = coluna->direita;
-                }
-                if (coluna->linha == colAtual->linha && coluna->coluna == colAtual->coluna) {
-                    coluna->valor = colAtual->valor;
-                } else {
-                    Node* novo = new Node(coluna->direita, coluna->abaixo, colAtual->linha, colAtual->coluna, colAtual->valor);
-                    coluna->direita = novo;
-                    coluna->abaixo = novo;
-                }
+                this->insert(colAtual->linha, colAtual->coluna, colAtual->valor);
                 colAtual = colAtual->direita;
             }
             linhaAtual = linhaAtual->abaixo;
@@ -279,29 +223,36 @@ SparseMatrix& SparseMatrix::operator=(const SparseMatrix& matriz) {
 }
 
 
+
 //funcao opcional de igualdade
 bool operator==(const SparseMatrix& matriz) const {
-        if (this->Linha != matriz.Linha || this->Coluna != matriz.Coluna) {
-            return false;
+    if (this->Linha != matriz.Linha || this->Coluna != matriz.Coluna) {
+        return false;
+    }
+
+    Node* linhaAtual = this->m_head->abaixo;
+    Node* linhaOutra = matriz.m_head->abaixo;
+
+    while (linhaAtual != this->m_head && linhaOutra != matriz.m_head) {
+        Node* colAtual = linhaAtual->direita;
+        Node* colOutra = linhaOutra->direita;
+
+        while (colAtual != linhaAtual || colOutra != linhaOutra) {
+            if ((colAtual == linhaAtual && colOutra != linhaOutra) ||
+                (colAtual != linhaAtual && colOutra == linhaOutra) ||
+                (colAtual->coluna != colOutra->coluna) ||
+                (colAtual->valor != colOutra->valor)) {
+                return false;
+            }
+            colAtual = colAtual->direita;
+            colOutra = colOutra->direita;
         }
 
-        Node* linhaAtual = this->m_head->abaixo;
-        Node* linhaOutra = matriz.m_head->abaixo;
-        while (linhaAtual != this->m_head) {
-            Node* colAtual = linhaAtual->direita;
-            Node* colOutra = linhaOutra->direita;
-            while (colAtual != linhaAtual) {
-                if (colAtual->linha != colOutra->linha || colAtual->coluna != colOutra->coluna || colAtual->valor != colOutra->valor) {
-                    return false;
-                }
-                colAtual = colAtual->direita;
-                colOutra = colOutra->direita;
-            }
-            linhaAtual = linhaAtual->abaixo;
-            linhaOutra = linhaOutra->abaixo;
-        }
-        return true;
+        linhaAtual = linhaAtual->abaixo;
+        linhaOutra = linhaOutra->abaixo;
     }
+    return true;
+}
 
 //funcao opcional de desigualdade
 bool operator!=(const SparseMatrix& matriz) const {
