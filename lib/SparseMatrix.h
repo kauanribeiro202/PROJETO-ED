@@ -49,9 +49,24 @@ SparseMatrix(int n, int m)
 }
 
 //construtor sem parametro
-SparseMatrix(){
+SparseMatrix() {
+        this->Linha = 1;
+        this->Coluna = 1;
 
-}
+        m_head = new Node(nullptr, nullptr, 0, 0, 0.0);
+        m_head->abaixo = m_head;
+        m_head->direita = m_head;
+
+        // Criação do cabeçalho da única linha
+        Node* m_cab = new Node(nullptr, nullptr, 0, 1, 0.0);
+        m_cab->abaixo = m_cab;
+        m_head->direita = m_cab;
+
+        // Criação do cabeçalho da única coluna
+        m_cab = new Node(nullptr, nullptr, 1, 0, 0.0);
+        m_cab->direita = m_cab;
+        m_head->abaixo = m_cab;
+    }
 
 //destrutor
 ~SparseMatrix(){
@@ -182,19 +197,52 @@ void print() {
 
 
 //funcao opcional de atribuicao
-void operator=(SparseMatrix&matriz){
+SparseMatrix& operator=(const SparseMatrix& matriz) {
+        if (this != &matriz) {
+            this->clear();
+            this->Linha = matriz.Linha;
+            this->Coluna = matriz.Coluna;
 
-}
+            Node* linhaAtual = matriz.m_head->abaixo;
+            while (linhaAtual != matriz.m_head) {
+                Node* colAtual = linhaAtual->direita;
+                while (colAtual != linhaAtual) {
+                    this->insert(colAtual->linha, colAtual->coluna, colAtual->valor);
+                    colAtual = colAtual->direita;
+                }
+                linhaAtual = linhaAtual->abaixo;
+            }
+        }
+        return *this;
+    }
 
 //funcao opcional de igualdade
-bool operator==(SparseMatrix&matriz){
+bool operator==(const SparseMatrix& matriz) const {
+        if (this->Linha != matriz.Linha || this->Coluna != matriz.Coluna) {
+            return false;
+        }
 
-    return false;
-}
+        Node* linhaAtual = this->m_head->abaixo;
+        Node* linhaOutra = matriz.m_head->abaixo;
+        while (linhaAtual != this->m_head) {
+            Node* colAtual = linhaAtual->direita;
+            Node* colOutra = linhaOutra->direita;
+            while (colAtual != linhaAtual) {
+                if (colAtual->linha != colOutra->linha || colAtual->coluna != colOutra->coluna || colAtual->valor != colOutra->valor) {
+                    return false;
+                }
+                colAtual = colAtual->direita;
+                colOutra = colOutra->direita;
+            }
+            linhaAtual = linhaAtual->abaixo;
+            linhaOutra = linhaOutra->abaixo;
+        }
+        return true;
+    }
 
 //funcao opcional de desigualdade
-void operator!=(SparseMatrix&matriz){
-    //return (!operator==(matriz));
+bool operator!=(const SparseMatrix& matriz) const {
+    return !(*this == matriz);
 }
 
 int getLinha(){
